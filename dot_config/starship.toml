@@ -1,0 +1,7 @@
+# Remove the new blank line
+add_newline = false
+
+# Personalize the prompt character
+[character]
+success_symbol = "[➜](bold green) "
+error_symbol = "[➜](bold red) "

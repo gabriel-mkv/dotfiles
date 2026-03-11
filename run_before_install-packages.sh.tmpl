@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# Binários Arch/Manjaro
+if [ -f /etc/arch-release ]; then
+    echo "Instalando pacotes via pacman..."
+    sudo pacman -S --noconfirm zsh kitty neovim starship ttf-jetbrains-mono-nerd git
+fi

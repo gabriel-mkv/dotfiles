@@ -1,0 +1,25 @@
+# --- Configs History ---
+HISTSIZE=10000
+SAVEHIST=10000
+setopt HIST_IGNORE_ALL_DUPS
+setopt SHARE_HISTORY
+
+# --- Antidote (Plugin Manager) ---
+source ${ZDOTDIR:-$HOME}/.antidote/antidote.zsh
+antidote load
+
+# --- Prompt Initializing (Starship) ---
+eval "$(starship init zsh)"
+
+# --- Aliases ---
+alias ls='ls --color=auto'
+alias l='ls -lah'
+alias grep='grep --color=auto'
+
+# --- Deactivate the auto correct ---
+unsetopt CORRECT
+unsetopt CORRECT_ALL
+
+#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
+export SDKMAN_DIR="$HOME/.sdkman"
+[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"

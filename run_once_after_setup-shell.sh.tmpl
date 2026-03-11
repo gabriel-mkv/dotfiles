@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# Antidote
+if [ ! -d "$HOME/.antidote" ]; then
+    echo "Clonando Antidote..."
+    git clone --depth=1 https://github.com/mattmc3/antidote.git "$HOME/.antidote"
+fi
+
+# SDKMAN
+if [ ! -d "$HOME/.sdkman" ]; then
+    echo "Instalando SDKMAN..."
+    export sdkman_auto_answer=true
+    curl -s "https://get.sdkman.io" | bash
+fi
