@@ -1,7 +1,23 @@
 #!/bin/bash
 
-# Binários Arch/Manjaro
+# Lista de pacotes
+packages=(zsh kitty neovim starship ttf-jetbrains-mono-nerd)
+missing_packages=()
+
+# Arch/Manjaro
 if [ -f /etc/arch-release ]; then
-    echo "Instalando pacotes via pacman..."
-    sudo pacman -S --noconfirm zsh kitty neovim starship ttf-jetbrains-mono-nerd git
+    echo "Verificando pacotes do sistema..."
+
+    for pkg in "${packages[@]}"; do
+        if ! pacman -Qi "$pkg" &> /dev/null; then
+            missing_packages+=("$pkg")
+        fi
+    done
+
+    if [ ${#missing_packages[@]} -gt 0 ]; then
+        echo "Instalando pacotes ausentes: ${missing_packages[*]}"
+        sudo pacman -S --noconfirm "${missing_packages[@]}"
+    else
+        echo "Todos os pacotes já estão instalados. Pulando etapa."
+    fi
 fi
