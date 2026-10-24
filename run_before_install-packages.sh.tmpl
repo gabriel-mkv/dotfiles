@@ -1,10 +1,11 @@
 #!/bin/bash
+set -euo pipefail
 
-# Lista de pacotes
-packages=(zsh kitty neovim starship ttf-jetbrains-mono-nerd)
+# --- Package list ---
+packages=(zsh kitty neovim starship ttf-jetbrains-mono-nerd git curl zip unzip)
 missing_packages=()
 
-# Arch/Manjaro
+# --- Arch/Manjaro ---
 if [ -f /etc/arch-release ]; then
     echo "Verificando pacotes do sistema..."
 
@@ -16,7 +17,7 @@ if [ -f /etc/arch-release ]; then
 
     if [ ${#missing_packages[@]} -gt 0 ]; then
         echo "Instalando pacotes ausentes: ${missing_packages[*]}"
-        sudo pacman -S --noconfirm "${missing_packages[@]}"
+        sudo pacman -S --needed --noconfirm "${missing_packages[@]}"
     else
         echo "Todos os pacotes já estão instalados. Pulando etapa."
     fi

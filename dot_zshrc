@@ -1,15 +1,18 @@
 # --- Configs History ---
+HISTFILE="$HOME/.zsh_history"
 HISTSIZE=10000
 SAVEHIST=10000
 setopt HIST_IGNORE_ALL_DUPS
 setopt SHARE_HISTORY
 
 # --- Antidote (Plugin Manager) ---
-source ${ZDOTDIR:-$HOME}/.antidote/antidote.zsh
-antidote load
+if [[ -r ${ZDOTDIR:-$HOME}/.antidote/antidote.zsh ]]; then
+    source ${ZDOTDIR:-$HOME}/.antidote/antidote.zsh
+    antidote load
+fi
 
 # --- Prompt Initializing (Starship) ---
-eval "$(starship init zsh)"
+command -v starship >/dev/null && eval "$(starship init zsh)"
 
 # --- Aliases ---
 alias ls='ls --color=auto'
@@ -20,6 +23,10 @@ alias grep='grep --color=auto'
 unsetopt CORRECT
 unsetopt CORRECT_ALL
 
-#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
+# --- Editor ---
+export EDITOR=nvim
+export VISUAL=nvim
+
+# --- SDKMAN ---
 export SDKMAN_DIR="$HOME/.sdkman"
 [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"

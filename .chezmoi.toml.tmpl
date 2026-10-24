@@ -1,0 +1,9 @@
+{{- $name := promptStringOnce . "name" "Nome para o git" -}}
+{{- $email := promptStringOnce . "email" "Email para o git" -}}
+
+[edit]
+  command = "nvim"
+
+[data]
+  name = {{ $name | quote }}
+  email = {{ $email | quote }}
