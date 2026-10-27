@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 # --- Antidote ---
 if [ ! -d "$HOME/.antidote" ]; then
@@ -11,5 +12,5 @@ if [ ! -d "$HOME/.sdkman" ]; then
     echo "Instalando SDKMAN..."
     export sdkman_auto_answer=true
     export sdkman_rcupdate=false
-+   curl -s "https://get.sdkman.io?rcupdate=false" | bash
+    curl -s "https://get.sdkman.io?rcupdate=false" | bash
 fi

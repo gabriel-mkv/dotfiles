@@ -2,23 +2,74 @@
 set -euo pipefail
 
 # --- Package list ---
-packages=(zsh kitty neovim starship ttf-jetbrains-mono-nerd git curl zip unzip)
+if [ -f /etc/arch-release ]; then
+    package_manager="pacman"
+    packages=(zsh kitty neovim starship ttf-jetbrains-mono-nerd git curl zip unzip)
+elif [ -f /etc/fedora-release ]; then
+    package_manager="dnf"
+    packages=(zsh kitty neovim git curl zip unzip)
+else
+    echo "Distribuição não suportada."
+    exit 1
+fi
+
+# --- Fedora: Starship ---
+if [ "$package_manager" = "dnf" ]; then
+    if ! rpm -q starship &>/dev/null; then
+        sudo dnf install -y dnf-plugins-core
+        sudo dnf copr enable -y atim/starship
+        packages+=(starship)
+    fi
+fi
+
+# --- Check installed packages ---
 missing_packages=()
 
-# --- Arch/Manjaro ---
-if [ -f /etc/arch-release ]; then
-    echo "Verificando pacotes do sistema..."
+for pkg in "${packages[@]}"; do
+    if [ "$package_manager" = "pacman" ]; then
+        pacman -Qi "$pkg" &>/dev/null || missing_packages+=("$pkg")
+    else
+        rpm -q "$pkg" &>/dev/null || missing_packages+=("$pkg")
+    fi
+done
 
-    for pkg in "${packages[@]}"; do
-        if ! pacman -Qi "$pkg" &> /dev/null; then
-            missing_packages+=("$pkg")
-        fi
-    done
+# --- Install missing packages ---
+if [ "${#missing_packages[@]}" -gt 0 ]; then
+    echo "Instalando pacotes ausentes: ${missing_packages[*]}"
 
-    if [ ${#missing_packages[@]} -gt 0 ]; then
-        echo "Instalando pacotes ausentes: ${missing_packages[*]}"
+    if [ "$package_manager" = "pacman" ]; then
         sudo pacman -S --needed --noconfirm "${missing_packages[@]}"
     else
-        echo "Todos os pacotes já estão instalados. Pulando etapa."
+        sudo dnf install -y "${missing_packages[@]}"
+    fi
+else
+    echo "Todos os pacotes já estão instalados. Pulando etapa."
+fi
+
+# --- Fedora: JetBrainsMono Nerd Font ---
+if [ "$package_manager" = "dnf" ]; then
+    font_dir="/usr/local/share/fonts/JetBrainsMonoNerdFont"
+    font_url="https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.tar.xz"
+
+    if ! find "$font_dir" -maxdepth 1 -name 'JetBrainsMonoNerdFont-Regular.ttf' -print -quit 2>/dev/null | grep -q .; then
+        temp_dir="$(mktemp -d)"
+        trap 'rm -rf "$temp_dir"' EXIT
+
+        curl -fL "$font_url" -o "$temp_dir/JetBrainsMono.tar.xz"
+        mkdir -p "$temp_dir/fonts"
+        tar -xf "$temp_dir/JetBrainsMono.tar.xz" -C "$temp_dir/fonts"
+
+        if ! find "$temp_dir/fonts" -name 'JetBrainsMonoNerdFont-Regular.ttf' -print -quit | grep -q .; then
+            echo "Erro: arquivo da fonte esperado não foi encontrado."
+            exit 1
+        fi
+
+        sudo install -d "$font_dir"
+        find "$temp_dir/fonts" -maxdepth 1 -type f -name '*.ttf' \
+            -exec sudo install -m 644 -t "$font_dir" {} +
+
+        sudo fc-cache -f "$font_dir"
+    else
+        echo "JetBrainsMono Nerd Font já está instalada."
     fi
 fi
