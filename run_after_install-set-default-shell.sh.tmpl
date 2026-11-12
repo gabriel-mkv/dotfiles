@@ -1,0 +1,24 @@
+#!/bin/bash
+set -euo pipefail
+
+# --- Set Zsh as default shell ---
+zsh_path="$(command -v zsh)"
+
+if [ -z "$zsh_path" ]; then
+    echo "Erro: Zsh não encontrado."
+    exit 1
+fi
+
+if ! grep -Fxq "$zsh_path" /etc/shells; then
+    echo "Erro: $zsh_path não está listado em /etc/shells."
+    exit 1
+fi
+
+current_shell="$(getent passwd "$USER" | cut -d: -f7)"
+
+if [ "$current_shell" != "$zsh_path" ]; then
+    echo "Definindo Zsh como shell padrão..."
+    chsh -s "$zsh_path"
+else
+    echo "Zsh já é a shell padrão."
+fi
